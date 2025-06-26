@@ -1,6 +1,6 @@
 # Save Encryption Toolkit for Unity
 
-A robust, flexible, and secure save system for Unity games, offering advanced encryption capabilities, support for various serialization formats, and easy integration. Protect your player's data with confidence!
+A flexible, encryption-ready save system toolkit for Unity. Use your own save manager while leveraging this toolkit’s robust encryption and serialization utilities. 
 
 ## Features
 - **AES Encryption**: Securely encrypt save data using AES, with dynamically generated and obfuscated keys to prevent tampering and reverse-engineering.
