@@ -1,0 +1,31 @@
+{
+  "name": "com.haruchanz64.saveencryptiontoolkit",
+  "version": "1.0.0",
+  "displayName": "Save Encryption Toolkit",
+  "description": "A flexible, encryption-ready save system toolkit for Unity with AES encryption, obfuscated keys, and extensible serialization handlers.",
+  "unity": "6000.0",
+  "keywords": [
+    "save",
+    "encryption",
+    "aes",
+    "serialization",
+    "security",
+    "toolkit"
+  ],
+  "author": {
+    "name": "haruchanz64",
+    "url": "https://github.com/haruchanz64"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/haruchanz64/SaveEncryptionToolkit.git"
+  },
+  "license": "MIT",
+  "samples": [
+    {
+      "displayName": "Encrypted Save Manager Sample",
+      "description": "Example MonoBehaviour wiring EncryptionSettings, EncryptionUtility, and JsonSaveHandler to disk.",
+      "path": "Samples~/EncryptedSaveManager"
+    }
+  ]
+}
