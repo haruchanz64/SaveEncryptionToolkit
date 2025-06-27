@@ -27,8 +27,6 @@ With the `EncryptionSettings` asset selected, click the "Generate & Apply Secure
 
 ## Save & Load Usage
 
-The `SaveManager` class is the core of the toolkit, allowing you to easily save and load any serializable data.
-
 ### Example: Basic Save/Load with SaveManager
 
 ```csharp
@@ -52,7 +50,7 @@ public class PlayerData
 
 public class GameSaveSystem : MonoBehaviour
 {
-    private SaveManager _saveManager;
+    private SaveManager _saveManager; // You must create your own SaveManager class
     private string _filePath;
 
     void Awake()
