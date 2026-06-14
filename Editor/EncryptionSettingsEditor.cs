@@ -79,6 +79,23 @@ namespace SaveEncryptionToolkit.Editor
                 AssetDatabase.Refresh();
             }
 
+            EditorGUILayout.Space(5);
+            var hasValidKeys = settings.HasValidKeys();
+            EditorGUILayout.HelpBox(
+                hasValidKeys
+                    ? "Key status: Valid obfuscated AES key and IV."
+                    : "Key status: Missing, invalid, or unencoded key/IV. Generate keys or run Tools > Save Encryption Toolkit > Fix Unencoded Encryption Settings.",
+                hasValidKeys ? MessageType.Info : MessageType.Error
+            );
+
+            using (new EditorGUI.DisabledScope(!hasValidKeys))
+            {
+                if (GUILayout.Button("Verify Keys (Round-Trip Test)", GUILayout.Height(26)))
+                {
+                    VerifyKeysRoundTrip(settings);
+                }
+            }
+
             EditorGUILayout.Space(10);
             EditorGUILayout.HelpBox(
                 "Do not commit this asset to public repositories or expose it in builds.\n" +
@@ -138,6 +155,36 @@ namespace SaveEncryptionToolkit.Runtime
             }
 
             return "Assets/SaveEncryptionToolkit/Runtime";
+        }
+
+        private static void VerifyKeysRoundTrip(EncryptionSettings settings)
+        {
+            try
+            {
+                const string probe = "SaveEncryptionToolkit::VerificationProbe::2026";
+                EncryptionUtility.Initialize(settings);
+                var encrypted = EncryptionUtility.EncryptAuthenticated(probe);
+                var decrypted = EncryptionUtility.DecryptAuthenticated(encrypted);
+
+                if (decrypted == probe)
+                {
+                    EditorUtility.DisplayDialog(
+                        "Key Verification Passed",
+                        "AES + HMAC-SHA256 authenticated encryption round-trip succeeded.",
+                        "OK");
+                }
+                else
+                {
+                    EditorUtility.DisplayDialog(
+                        "Key Verification Failed",
+                        "Decrypted output did not match the verification probe.",
+                        "OK");
+                }
+            }
+            catch (Exception ex)
+            {
+                EditorUtility.DisplayDialog("Key Verification Failed", ex.Message, "OK");
+            }
         }
 
         private static void ShowKeyGeneratedDialogDelayed()

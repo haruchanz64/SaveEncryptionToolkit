@@ -51,6 +51,27 @@ namespace SaveEncryptionToolkit.Encryption
             return decoded.Substring(0, decoded.Length - salt.Length);
         }
 
+        public static bool TryDecode(string obfuscated, out string decodedValue)
+        {
+            decodedValue = null;
+            if (string.IsNullOrEmpty(obfuscated))
+            {
+                return false;
+            }
+
+            try
+            {
+                decodedValue = Decode(obfuscated);
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
+        public static bool IsEncoded(string value) => TryDecode(value, out _);
+
         private static string GenerateSalt(int length)
         {
             const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";

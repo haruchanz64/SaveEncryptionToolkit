@@ -30,14 +30,14 @@ namespace SaveEncryptionToolkit.Editor
 
                 var modified = false;
 
-                if (!string.IsNullOrEmpty(settings.encryptedKey) && !settings.encryptedKey.Contains("::"))
+                if (!string.IsNullOrEmpty(settings.encryptedKey) && !KeyObfuscator.IsEncoded(settings.encryptedKey))
                 {
                     Debug.Log($"[EncryptionFixer] Re-encoding key in {path}");
                     settings.encryptedKey = KeyObfuscator.Encode(settings.encryptedKey);
                     modified = true;
                 }
 
-                if (!string.IsNullOrEmpty(settings.encryptedIv) && !settings.encryptedIv.Contains("::"))
+                if (!string.IsNullOrEmpty(settings.encryptedIv) && !KeyObfuscator.IsEncoded(settings.encryptedIv))
                 {
                     Debug.Log($"[EncryptionFixer] Re-encoding IV in {path}");
                     settings.encryptedIv = KeyObfuscator.Encode(settings.encryptedIv);
