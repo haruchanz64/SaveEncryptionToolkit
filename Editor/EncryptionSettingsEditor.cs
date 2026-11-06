@@ -84,7 +84,7 @@ namespace SaveEncryptionToolkit.Editor
             EditorGUILayout.HelpBox(
                 hasValidKeys
                     ? "Key status: Valid obfuscated AES key and IV."
-                    : "Key status: Missing, invalid, or unencoded key/IV. Generate keys or run Tools > Save Encryption Toolkit > Fix Unencoded Encryption Settings.",
+                    : "Key status: Missing, invalid, or unencoded key/IV. Generate keys or run Tools > HaruChanZ64 > Assets > Save Encryption Toolkit > Fix Unencoded Encryption Settings.",
                 hasValidKeys ? MessageType.Info : MessageType.Error
             );
 

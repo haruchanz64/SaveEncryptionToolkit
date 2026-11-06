@@ -6,7 +6,7 @@ namespace SaveEncryptionToolkit.Editor
 {
     public static class EncryptionFixer
     {
-        [MenuItem("Tools/Save Encryption Toolkit/Fix Unencoded Encryption Settings")]
+        [MenuItem("Tools/HaruChanZ64/Assets/Save Encryption Toolkit/Fix Unencoded Encryption Settings", false, 152)]
         public static void FixEncryptionAsset()
         {
             var guids = AssetDatabase.FindAssets("t:EncryptionSettings");

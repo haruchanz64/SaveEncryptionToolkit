@@ -82,7 +82,7 @@ public sealed class CustomSaveHandler : ISaveHandler
 
 ## Troubleshooting
 
-- Legacy or unencoded settings: run `Tools > Save Encryption Toolkit > Fix Unencoded Encryption Settings` to re-encode any unencoded `EncryptionSettings` assets.
+- Legacy or unencoded settings: run `Tools > HaruChanZ64 > Assets > Save Encryption Toolkit > Fix Unencoded Encryption Settings` to re-encode any unencoded `EncryptionSettings` assets.
 - Security note: do not commit `EncryptionSettings.asset` to public repositories or bundle it in player builds. Use the generated `ProductionKeyStore` for builds.
 - `BinarySaveHandler`: uses `BinaryFormatter`, which is obsolete in modern .NET. Prefer `JsonSaveHandler` or a custom `ISaveHandler` for new projects.
 
