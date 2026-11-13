@@ -1,6 +1,6 @@
 {
   "name": "com.haruchanz64.saveencryptiontoolkit",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "displayName": "Save Encryption Toolkit",
   "description": "Encryption-ready Unity save toolkit with authenticated AES + HMAC-SHA256 envelopes, atomic backup storage, obfuscated embedded keys, and pluggable serialization handlers.",
   "unity": "6000.0",

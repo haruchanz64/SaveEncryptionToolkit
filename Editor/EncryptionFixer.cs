@@ -4,8 +4,14 @@ using UnityEngine;
 
 namespace SaveEncryptionToolkit.Editor
 {
+    /// <summary>
+    /// Editor utility that scans the project for <see cref="EncryptionSettings"/> assets and re-encodes any raw key or IV fields with <see cref="KeyObfuscator"/>.
+    /// </summary>
     public static class EncryptionFixer
     {
+        /// <summary>
+        /// Menu command that finds all <see cref="EncryptionSettings"/> assets in the project and obfuscates any non-empty key or IV values that fail <see cref="KeyObfuscator.IsEncoded"/>.
+        /// </summary>
         [MenuItem("Tools/HaruChanZ64/Assets/Save Encryption Toolkit/Fix Unencoded Encryption Settings", false, 152)]
         public static void FixEncryptionAsset()
         {

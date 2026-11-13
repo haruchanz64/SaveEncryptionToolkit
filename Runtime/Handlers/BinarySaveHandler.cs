@@ -4,8 +4,13 @@ using System.Runtime.Serialization.Formatters.Binary;
 
 namespace SaveEncryptionToolkit.Handlers
 {
+    /// <summary>
+    /// Legacy <see cref="ISaveHandler"/> implementation backed by <see cref="BinaryFormatter"/> and Base64 encoding.
+    /// Prefer <see cref="JsonSaveHandler"/> or a custom <see cref="ISaveHandler"/> for new projects because <see cref="BinaryFormatter"/> is obsolete in modern .NET.
+    /// </summary>
     public class BinarySaveHandler : ISaveHandler
     {
+        /// <inheritdoc/>
         public string Serialize<T>(T data)
         {
             if (data == null)
@@ -19,6 +24,7 @@ namespace SaveEncryptionToolkit.Handlers
 #pragma warning restore SYSLIB0011
         }
 
+        /// <inheritdoc/>
         public T Deserialize<T>(string serialized)
         {
             if (string.IsNullOrEmpty(serialized))

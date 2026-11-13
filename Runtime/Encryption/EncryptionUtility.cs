@@ -5,6 +5,9 @@ using UnityEngine;
 
 namespace SaveEncryptionToolkit.Encryption
 {
+    /// <summary>
+    /// Static AES encryption utility supporting versioned Encrypt-then-MAC (AES-CBC + HMAC-SHA256) envelopes and legacy static-IV AES-CBC payloads.
+    /// </summary>
     public static class EncryptionUtility
     {
         private static readonly byte[] AuthenticatedMagic = { 0x53, 0x45, 0x54, 0x31 }; // "SET1"
@@ -16,14 +19,21 @@ namespace SaveEncryptionToolkit.Encryption
         private static byte[] _iv;
         private static byte[] _macKey;
 
+        /// <summary>
+        /// Gets a value indicating whether an AES key, IV, and derived HMAC key are currently loaded in memory.
+        /// </summary>
         public static bool IsInitialized => _key != null && _iv != null && _macKey != null;
 
+        // Clears cached static key material across Enter Play Mode domain reloads.
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
         private static void ResetStaticState()
         {
             Reset();
         }
 
+        /// <summary>
+        /// Zeroes out in-memory AES key, IV, and derived MAC key buffers and resets <see cref="IsInitialized"/> to <c>false</c>.
+        /// </summary>
         public static void Reset()
         {
             if (_key != null) Array.Clear(_key, 0, _key.Length);
@@ -34,6 +44,10 @@ namespace SaveEncryptionToolkit.Encryption
             _macKey = null;
         }
 
+        /// <summary>
+        /// Initializes the utility by decoding the obfuscated AES key and IV from an <see cref="EncryptionSettings"/> asset.
+        /// </summary>
+        /// <param name="encryptionSettings">Asset containing obfuscated AES key and IV strings. Must not be <c>null</c>.</param>
         public static void Initialize(EncryptionSettings encryptionSettings)
         {
             if (encryptionSettings == null)
@@ -42,6 +56,11 @@ namespace SaveEncryptionToolkit.Encryption
             Initialize(encryptionSettings.GetEncryptedKey(), encryptionSettings.GetEncryptedIvKey());
         }
 
+        /// <summary>
+        /// Initializes the utility from Base64-encoded AES key and IV strings.
+        /// </summary>
+        /// <param name="base64Key">Base64-encoded 128-, 192-, or 256-bit AES key.</param>
+        /// <param name="base64Iv">Base64-encoded 128-bit AES IV used by legacy static-IV methods.</param>
         public static void Initialize(string base64Key, string base64Iv)
         {
             if (string.IsNullOrEmpty(base64Key))
@@ -55,6 +74,11 @@ namespace SaveEncryptionToolkit.Encryption
             Initialize(key, iv);
         }
 
+        /// <summary>
+        /// Initializes the utility from raw AES key and IV byte arrays, defensively cloning both buffers and deriving a separate HMAC-SHA256 key.
+        /// </summary>
+        /// <param name="key">Raw AES key bytes; must be 16, 24, or 32 bytes long.</param>
+        /// <param name="iv">Raw AES IV bytes used by legacy static-IV encryption; must be 16 bytes long.</param>
         public static void Initialize(byte[] key, byte[] iv)
         {
             if (key == null)
@@ -77,6 +101,8 @@ namespace SaveEncryptionToolkit.Encryption
         /// <summary>
         /// Encrypts plain text using the configured static IV (legacy format). Prefer <see cref="EncryptAuthenticated"/> for new saves.
         /// </summary>
+        /// <param name="plainText">UTF-8 plain text to encrypt. Must not be <c>null</c>.</param>
+        /// <returns>Base64-encoded AES-CBC ciphertext.</returns>
         public static string Encrypt(string plainText)
         {
             EnsureInitialized();
@@ -98,6 +124,8 @@ namespace SaveEncryptionToolkit.Encryption
         /// <summary>
         /// Decrypts cipher text produced by <see cref="Encrypt"/>.
         /// </summary>
+        /// <param name="cipherText">Base64-encoded AES-CBC ciphertext. Must not be <c>null</c> or empty.</param>
+        /// <returns>The decrypted UTF-8 plain text.</returns>
         public static string Decrypt(string cipherText)
         {
             EnsureInitialized();
@@ -116,6 +144,12 @@ namespace SaveEncryptionToolkit.Encryption
             return Encoding.UTF8.GetString(decrypted);
         }
 
+        /// <summary>
+        /// Attempts to decrypt legacy cipher text produced by <see cref="Encrypt"/> without throwing on invalid input or uninitialized state.
+        /// </summary>
+        /// <param name="cipherText">Base64-encoded legacy AES ciphertext.</param>
+        /// <param name="plainText">When this method returns <c>true</c>, contains the decrypted UTF-8 string; otherwise <c>null</c>.</param>
+        /// <returns><c>true</c> if decryption succeeded; otherwise <c>false</c>.</returns>
         public static bool TryDecrypt(string cipherText, out string plainText)
         {
             plainText = null;
@@ -136,6 +170,8 @@ namespace SaveEncryptionToolkit.Encryption
         /// <summary>
         /// Encrypts plain text with a fresh random 128-bit IV and an HMAC-SHA256 authentication tag (Encrypt-then-MAC).
         /// </summary>
+        /// <param name="plainText">UTF-8 plain text to encrypt. Must not be <c>null</c>.</param>
+        /// <returns>Base64-encoded <c>SET1</c> authenticated envelope.</returns>
         public static string EncryptAuthenticated(string plainText)
         {
             if (plainText == null)
@@ -150,6 +186,8 @@ namespace SaveEncryptionToolkit.Encryption
         /// Verifies the HMAC-SHA256 tag and decrypts a payload produced by <see cref="EncryptAuthenticated"/>.
         /// Throws <see cref="CryptographicException"/> if the payload has been tampered with or corrupted.
         /// </summary>
+        /// <param name="authenticatedPayload">Base64-encoded <c>SET1</c> authenticated envelope.</param>
+        /// <returns>The verified and decrypted UTF-8 plain text.</returns>
         public static string DecryptAuthenticated(string authenticatedPayload)
         {
             if (string.IsNullOrEmpty(authenticatedPayload))
@@ -160,6 +198,12 @@ namespace SaveEncryptionToolkit.Encryption
             return Encoding.UTF8.GetString(plainBytes);
         }
 
+        /// <summary>
+        /// Attempts to verify and decrypt an authenticated payload produced by <see cref="EncryptAuthenticated"/> without throwing on failure.
+        /// </summary>
+        /// <param name="authenticatedPayload">Base64-encoded <c>SET1</c> authenticated envelope.</param>
+        /// <param name="plainText">When this method returns <c>true</c>, contains the verified UTF-8 plain text; otherwise <c>null</c>.</param>
+        /// <returns><c>true</c> if HMAC verification and decryption succeeded; otherwise <c>false</c>.</returns>
         public static bool TryDecryptAuthenticated(string authenticatedPayload, out string plainText)
         {
             plainText = null;
@@ -180,6 +224,8 @@ namespace SaveEncryptionToolkit.Encryption
         /// <summary>
         /// Encrypts raw bytes into a versioned authenticated envelope: [SET1 (4B)][Random IV (16B)][Ciphertext][HMAC-SHA256 (32B)].
         /// </summary>
+        /// <param name="plainBytes">Raw plaintext bytes to encrypt. Must not be <c>null</c>.</param>
+        /// <returns>The versioned binary envelope containing the magic header, random 16-byte IV, AES-CBC ciphertext, and 32-byte HMAC-SHA256 tag.</returns>
         public static byte[] EncryptBytes(byte[] plainBytes)
         {
             EnsureInitialized();
@@ -205,6 +251,7 @@ namespace SaveEncryptionToolkit.Encryption
             Buffer.BlockCopy(randomIv, 0, envelope, AuthenticatedMagic.Length, IvLength);
             Buffer.BlockCopy(cipherBytes, 0, envelope, AuthenticatedMagic.Length + IvLength, cipherBytes.Length);
 
+            // Compute HMAC over header + IV + ciphertext (Encrypt-then-MAC).
             using var hmac = new HMACSHA256(_macKey);
             var mac = hmac.ComputeHash(envelope, 0, signedLength);
             Buffer.BlockCopy(mac, 0, envelope, signedLength, MacLength);
@@ -213,8 +260,10 @@ namespace SaveEncryptionToolkit.Encryption
         }
 
         /// <summary>
-        /// Verifies and decrypts a versioned authenticated envelope produced by <see cref="EncryptBytes"/>.
+        /// Verifies the header and HMAC-SHA256 tag in constant time, then decrypts a versioned envelope produced by <see cref="EncryptBytes"/>.
         /// </summary>
+        /// <param name="envelope">Binary <c>SET1</c> authenticated envelope.</param>
+        /// <returns>The verified and decrypted plaintext bytes.</returns>
         public static byte[] DecryptBytes(byte[] envelope)
         {
             EnsureInitialized();
@@ -232,6 +281,7 @@ namespace SaveEncryptionToolkit.Encryption
                     throw new CryptographicException("Unsupported or corrupted encrypted payload header.");
             }
 
+            // Always verify the MAC before touching AES decryption to prevent padding-oracle attacks.
             var signedLength = envelope.Length - MacLength;
             using var hmac = new HMACSHA256(_macKey);
             var expectedMac = hmac.ComputeHash(envelope, 0, signedLength);
@@ -253,12 +303,20 @@ namespace SaveEncryptionToolkit.Encryption
             return decryptor.TransformFinalBlock(envelope, cipherOffset, cipherLength);
         }
 
+        /// <summary>
+        /// Throws <see cref="InvalidOperationException"/> if <see cref="IsInitialized"/> is <c>false</c>.
+        /// </summary>
         private static void EnsureInitialized()
         {
             if (!IsInitialized)
                 throw new InvalidOperationException("EncryptionUtility is not initialized. Call Initialize() first.");
         }
 
+        /// <summary>
+        /// Derives a dedicated 256-bit HMAC key from the AES key using SHA-256 with a fixed domain separator so encryption and authentication do not reuse the same raw key.
+        /// </summary>
+        /// <param name="key">Raw AES key bytes.</param>
+        /// <returns>A 32-byte domain-separated HMAC key.</returns>
         private static byte[] DeriveMacKey(byte[] key)
         {
             var material = new byte[key.Length + MacKeyDomain.Length];
@@ -269,6 +327,15 @@ namespace SaveEncryptionToolkit.Encryption
             return sha.ComputeHash(material);
         }
 
+        /// <summary>
+        /// Compares two byte ranges in constant time via bitwise XOR accumulation to avoid timing side channels during MAC verification.
+        /// </summary>
+        /// <param name="a">First byte array.</param>
+        /// <param name="aOffset">Starting offset in <paramref name="a"/>.</param>
+        /// <param name="b">Second byte array.</param>
+        /// <param name="bOffset">Starting offset in <paramref name="b"/>.</param>
+        /// <param name="length">Number of bytes to compare.</param>
+        /// <returns><c>true</c> if all bytes in the compared slices match; otherwise <c>false</c>.</returns>
         private static bool FixedTimeEquals(byte[] a, int aOffset, byte[] b, int bOffset, int length)
         {
             var diff = 0;

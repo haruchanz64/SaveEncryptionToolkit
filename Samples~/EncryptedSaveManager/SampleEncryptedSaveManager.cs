@@ -6,17 +6,31 @@ using UnityEngine;
 
 namespace SaveEncryptionToolkit.Samples
 {
+    /// <summary>
+    /// Serializable sample payload persisted by <see cref="SampleEncryptedSaveManager"/>.
+    /// </summary>
     [Serializable]
     public sealed class SamplePlayerSaveData
     {
+        /// <summary>
+        /// Sample player display name.
+        /// </summary>
         public string playerName = "Adventurer";
+
+        /// <summary>
+        /// Sample character level.
+        /// </summary>
         public int level = 1;
+
+        /// <summary>
+        /// Sample gold balance.
+        /// </summary>
         public int gold = 250;
     }
 
     /// <summary>
-    /// Example MonoBehaviour combining EncryptionSettings, EncryptionUtility, and JsonSaveHandler
-    /// to write and read an AES-encrypted save file under Application.persistentDataPath.
+    /// Example <see cref="MonoBehaviour"/> combining <see cref="EncryptionSettings"/>, <see cref="EncryptionUtility"/>, and <see cref="JsonSaveHandler"/>
+    /// to write and read an AES-encrypted save file under <see cref="Application.persistentDataPath"/>.
     /// </summary>
     public sealed class SampleEncryptedSaveManager : MonoBehaviour
     {
@@ -36,6 +50,9 @@ namespace SaveEncryptionToolkit.Samples
             }
         }
 
+        /// <summary>
+        /// Serializes <c>currentSave</c> to JSON, encrypts it with <see cref="EncryptionUtility.Encrypt"/>, and writes the ciphertext to disk.
+        /// </summary>
         [ContextMenu("Save Encrypted Data")]
         public void Save()
         {
@@ -50,6 +67,9 @@ namespace SaveEncryptionToolkit.Samples
             Debug.Log($"[SampleEncryptedSaveManager] Saved encrypted file to {SavePath}");
         }
 
+        /// <summary>
+        /// Reads the encrypted file from disk, decrypts it with <see cref="EncryptionUtility.Decrypt"/>, and deserializes it into <c>currentSave</c>.
+        /// </summary>
         [ContextMenu("Load Encrypted Data")]
         public void Load()
         {

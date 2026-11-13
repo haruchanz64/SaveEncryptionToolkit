@@ -5,6 +5,11 @@ All notable changes to this package will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.1] - 2026-11-13
+### Changed
+- Upgraded `README.md` to a full developer guide covering requirements, installation, quick start, `SET1` envelope and `.bak` recovery architecture, custom `ISaveHandler` and binary encryption examples, API reference table, included sample, test coverage, and troubleshooting.
+- Added comprehensive XML documentation comments across all Runtime, Editor, and Sample C# scripts.
+
 ## [1.1.0] - 2026-06-14
 ### Added
 - Authenticated Encrypt-then-MAC APIs on `EncryptionUtility` (`EncryptAuthenticated`, `DecryptAuthenticated`, `TryDecryptAuthenticated`, `EncryptBytes`, `DecryptBytes`) using a fresh CSPRNG 128-bit IV per save and constant-time HMAC-SHA256 verification (`SET1` envelope).

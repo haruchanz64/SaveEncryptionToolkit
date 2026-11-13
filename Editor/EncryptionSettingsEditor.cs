@@ -6,6 +6,9 @@ using UnityEngine;
 
 namespace SaveEncryptionToolkit.Editor
 {
+    /// <summary>
+    /// Custom Inspector for <see cref="EncryptionSettings"/> providing key generation, <c>ProductionKeyStore.cs</c> emission, validation status, and authenticated round-trip verification.
+    /// </summary>
     [CustomEditor(typeof(EncryptionSettings))]
     public class EncryptionSettingsEditor : UnityEditor.Editor
     {
@@ -13,6 +16,9 @@ namespace SaveEncryptionToolkit.Editor
         // Key for EditorPrefs to persist dialog state across recompiles
         private const string ShowDialogPrefKey = "SaveEncryptionToolkit.ShowKeyGenDialog";
 
+        /// <summary>
+        /// Lazily initializes custom Inspector label styles.
+        /// </summary>
         private void InitStyles()
         {
             _titleStyle ??= new GUIStyle(EditorStyles.boldLabel)
@@ -22,6 +28,9 @@ namespace SaveEncryptionToolkit.Editor
             };
         }
 
+        /// <summary>
+        /// Restores the deferred key-generation confirmation dialog after domain reload if a key generation just triggered recompilation.
+        /// </summary>
         private void OnEnable()
         {
             if (EditorPrefs.GetBool(ShowDialogPrefKey, false))
@@ -33,6 +42,7 @@ namespace SaveEncryptionToolkit.Editor
             }
         }
 
+        /// <inheritdoc/>
         public override void OnInspectorGUI()
         {
             InitStyles();
@@ -104,6 +114,11 @@ namespace SaveEncryptionToolkit.Editor
             );
         }
 
+        /// <summary>
+        /// Writes a generated <c>ProductionKeyStore.cs</c> runtime helper containing the obfuscated AES key and IV constants.
+        /// </summary>
+        /// <param name="encryptedKey">Obfuscated AES key in <c>salt::base64</c> format.</param>
+        /// <param name="encryptedIv">Obfuscated AES IV in <c>salt::base64</c> format.</param>
         private void GenerateProductionKeyStoreClass(string encryptedKey, string encryptedIv)
         {
             var directory = ResolveRuntimeDirectory();
@@ -137,6 +152,10 @@ namespace SaveEncryptionToolkit.Runtime
             File.WriteAllText(filePath, classContent);
         }
 
+        /// <summary>
+        /// Resolves the output directory for <c>ProductionKeyStore.cs</c>, writing inside the toolkit folder when installed under <c>Assets/</c> and falling back to <c>Assets/SaveEncryptionToolkit/Runtime</c> for read-only UPM packages.
+        /// </summary>
+        /// <returns>Project-relative directory path for the generated key store script.</returns>
         private string ResolveRuntimeDirectory()
         {
             var script = MonoScript.FromScriptableObject(this);
@@ -157,6 +176,10 @@ namespace SaveEncryptionToolkit.Runtime
             return "Assets/SaveEncryptionToolkit/Runtime";
         }
 
+        /// <summary>
+        /// Initializes <see cref="EncryptionUtility"/> with <paramref name="settings"/> and performs an authenticated encrypt/decrypt probe, displaying the result in an editor dialog.
+        /// </summary>
+        /// <param name="settings">Settings asset whose obfuscated key and IV will be tested.</param>
         private static void VerifyKeysRoundTrip(EncryptionSettings settings)
         {
             try
@@ -187,6 +210,9 @@ namespace SaveEncryptionToolkit.Runtime
             }
         }
 
+        /// <summary>
+        /// Displays the deferred key-generation confirmation dialog once <see cref="AssetDatabase.Refresh()"/> completes.
+        /// </summary>
         private static void ShowKeyGeneratedDialogDelayed()
         {
             EditorApplication.delayCall -= ShowKeyGeneratedDialogDelayed;
