@@ -12,8 +12,8 @@ A flexible, encryption-ready save system toolkit for Unity. Use your own save ma
 ## Installation
 
 ### 1. Clone or Download
-- **Clone**: Clone this repository and copy the `SaveEncryptionToolkit` folder into your Unity project's `Assets` directory.
-- **Unity Package**: Alternatively, download the latest `.unitypackage` from the [Releases](https://github.com/haruchanz64/SaveEncryptionToolkit/releases) page and import it into your Unity project (Assets > Import Package > Custom Package...).
+- **Clone**: Clone this repository directly into your Unity project's `Assets` directory (e.g., `Assets/SaveEncryptionToolkit`).
+- **Download ZIP**: Click **Code > Download ZIP** on GitHub, extract the archive, and copy the extracted folder into your Unity project's `Assets` directory (e.g., `Assets/SaveEncryptionToolkit`).
 
 ### 2. Create Encryption Settings
 In your Unity Editor, right-click in the Project window or go to `Assets > Create > Save Encryption Toolkit > Encryption Settings`. This will create an `EncryptionSettings` ScriptableObject asset in your project. Select it in the inspector.
