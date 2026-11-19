@@ -23,7 +23,7 @@ With the `EncryptionSettings` asset selected, click the "Generate & Apply Secure
 - Generate a new, random AES key and IV.
 - Obfuscate these keys for security.
 - Store the obfuscated keys within the `EncryptionSettings` asset.
-- Crucially, it will automatically create or update `ProductionKeyStore.cs` in `Assets/SaveSystemToolkit/Runtime`, embedding the obfuscated keys directly into your game's compiled code for production builds.
+- Crucially, it will automatically create or update `ProductionKeyStore.cs` in `Assets/SaveEncryptionToolkit/Runtime`, embedding the obfuscated keys directly into your game's compiled code for production builds.
 
 ## Save & Load Usage
 
@@ -33,6 +33,7 @@ With the `EncryptionSettings` asset selected, click the "Generate & Apply Secure
 using SaveEncryptionToolkit;
 using SaveEncryptionToolkit.Encryption;
 using SaveEncryptionToolkit.Handlers;
+using SaveEncryptionToolkit.Runtime;
 using UnityEngine;
 using System.IO;
 using System;

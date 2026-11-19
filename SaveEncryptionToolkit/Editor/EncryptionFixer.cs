@@ -1,7 +1,8 @@
-﻿using UnityEditor;
+﻿using SaveEncryptionToolkit.Encryption;
+using UnityEditor;
 using UnityEngine;
 
-namespace SaveEncryptionToolkit.Encryption
+namespace SaveEncryptionToolkit.Editor
 {
     public static class EncryptionFixer
     {
@@ -21,16 +22,22 @@ namespace SaveEncryptionToolkit.Encryption
                 var path = AssetDatabase.GUIDToAssetPath(guid);
                 var settings = AssetDatabase.LoadAssetAtPath<EncryptionSettings>(path);
 
+                if (settings == null)
+                {
+                    Debug.LogWarning($"[EncryptionFixer] Failed to load EncryptionSettings at {path}");
+                    continue;
+                }
+
                 var modified = false;
 
-                if (!settings.encryptedKey.Contains("::"))
+                if (!string.IsNullOrEmpty(settings.encryptedKey) && !settings.encryptedKey.Contains("::"))
                 {
                     Debug.Log($"[EncryptionFixer] Re-encoding key in {path}");
                     settings.encryptedKey = KeyObfuscator.Encode(settings.encryptedKey);
                     modified = true;
                 }
 
-                if (!settings.encryptedIv.Contains("::"))
+                if (!string.IsNullOrEmpty(settings.encryptedIv) && !settings.encryptedIv.Contains("::"))
                 {
                     Debug.Log($"[EncryptionFixer] Re-encoding IV in {path}");
                     settings.encryptedIv = KeyObfuscator.Encode(settings.encryptedIv);
@@ -44,7 +51,7 @@ namespace SaveEncryptionToolkit.Encryption
                 }
                 else
                 {
-                    Debug.Log($"[EncryptionFixer] Already encoded: {path}");
+                    Debug.Log($"[EncryptionFixer] Already encoded or empty: {path}");
                 }
             }
 

@@ -8,6 +8,12 @@ namespace SaveEncryptionToolkit.Encryption
     {
         public static string Encode(string value, int saltLength = 12)
         {
+            if (value == null)
+                throw new ArgumentNullException(nameof(value));
+
+            if (saltLength <= 0)
+                throw new ArgumentOutOfRangeException(nameof(saltLength), "Salt length must be greater than zero.");
+
             var salt = GenerateSalt(saltLength);
             var combined = value + salt;
             var encoded = Convert.ToBase64String(Encoding.UTF8.GetBytes(combined));
@@ -16,9 +22,12 @@ namespace SaveEncryptionToolkit.Encryption
 
         public static string Decode(string obfuscated)
         {
+            if (string.IsNullOrEmpty(obfuscated))
+                throw new ArgumentException("Obfuscated key cannot be null or empty.", nameof(obfuscated));
+
             var parts = obfuscated.Split(new[] { "::" }, StringSplitOptions.None);
 
-            if (parts.Length != 2)
+            if (parts.Length != 2 || string.IsNullOrEmpty(parts[0]) || string.IsNullOrEmpty(parts[1]))
                 throw new FormatException("Invalid obfuscated key format. Expected format: 'salt::base64string'.");
 
             var salt = parts[0];
@@ -36,10 +45,10 @@ namespace SaveEncryptionToolkit.Encryption
 
             var decoded = Encoding.UTF8.GetString(decodedBytes);
 
-            if (!decoded.EndsWith(salt))
+            if (!decoded.EndsWith(salt, StringComparison.Ordinal))
                 throw new InvalidOperationException("Salt mismatch or tampered data.");
 
-            return decoded[..^salt.Length];
+            return decoded.Substring(0, decoded.Length - salt.Length);
         }
 
         private static string GenerateSalt(int length)

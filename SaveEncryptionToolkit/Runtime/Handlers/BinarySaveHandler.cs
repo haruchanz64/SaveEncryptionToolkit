@@ -8,6 +8,9 @@ namespace SaveEncryptionToolkit.Handlers
     {
         public string Serialize<T>(T data)
         {
+            if (data == null)
+                throw new ArgumentNullException(nameof(data));
+
 #pragma warning disable SYSLIB0011 // Suppress obsolete BinaryFormatter warning
             using var memoryStream = new MemoryStream();
             var formatter = new BinaryFormatter();
@@ -18,6 +21,9 @@ namespace SaveEncryptionToolkit.Handlers
 
         public T Deserialize<T>(string serialized)
         {
+            if (string.IsNullOrEmpty(serialized))
+                throw new ArgumentException("Serialized data cannot be null or empty.", nameof(serialized));
+
 #pragma warning disable SYSLIB0011
             var bytes = Convert.FromBase64String(serialized);
             using var memoryStream = new MemoryStream(bytes);

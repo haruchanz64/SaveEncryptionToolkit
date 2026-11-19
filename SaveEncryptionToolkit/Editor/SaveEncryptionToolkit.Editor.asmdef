@@ -1,8 +1,12 @@
 {
-    "name": "SaveEncryptionToolkit",
-    "rootNamespace": "",
-    "references": [],
-    "includePlatforms": [],
+    "name": "SaveEncryptionToolkit.Editor",
+    "rootNamespace": "SaveEncryptionToolkit.Editor",
+    "references": [
+        "SaveEncryptionToolkit"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": false,

@@ -10,7 +10,7 @@ namespace SaveEncryptionToolkit.Editor
     {
         private GUIStyle _titleStyle;
         // Key for EditorPrefs to persist dialog state across recompiles
-        private const string ShowDialogPrefKey = "SaveSystemToolkit.ShowKeyGenDialog";
+        private const string ShowDialogPrefKey = "SaveEncryptionToolkit.ShowKeyGenDialog";
 
         private void InitStyles()
         {
@@ -46,10 +46,16 @@ namespace SaveEncryptionToolkit.Editor
             EditorGUILayout.LabelField("Encryption Key Info", _titleStyle);
 
             EditorGUILayout.LabelField("Obfuscated AES Key", EditorStyles.miniBoldLabel);
-            EditorGUILayout.HelpBox(settings.encryptedKey, MessageType.None);
+            EditorGUILayout.HelpBox(
+                string.IsNullOrEmpty(settings.encryptedKey) ? "(Not generated yet)" : settings.encryptedKey,
+                MessageType.None
+            );
 
             EditorGUILayout.LabelField("Obfuscated AES IV", EditorStyles.miniBoldLabel);
-            EditorGUILayout.HelpBox(settings.encryptedIv, MessageType.None);
+            EditorGUILayout.HelpBox(
+                string.IsNullOrEmpty(settings.encryptedIv) ? "(Not generated yet)" : settings.encryptedIv,
+                MessageType.None
+            );
 
             EditorGUILayout.Space(10);
             EditorGUILayout.LabelField("Key Management", _titleStyle);
@@ -68,6 +74,7 @@ namespace SaveEncryptionToolkit.Editor
                 settings.encryptedIv = KeyObfuscator.Encode(rawIv);
 
                 EditorUtility.SetDirty(settings);
+                AssetDatabase.SaveAssets();
                 GenerateProductionKeyStoreClass(settings.encryptedKey, settings.encryptedIv);
 
                 // Set the EditorPrefs flag to indicate dialog should be shown after refresh
@@ -85,19 +92,17 @@ namespace SaveEncryptionToolkit.Editor
             );
         }
 
-        private static void GenerateProductionKeyStoreClass(string encryptedKey, string encryptedIv)
+        private void GenerateProductionKeyStoreClass(string encryptedKey, string encryptedIv)
         {
-            const string directory = "Assets/SaveSystemToolkit/Runtime";
+            var directory = ResolveRuntimeDirectory();
             var filePath = Path.Combine(directory, "ProductionKeyStore.cs");
 
             if (!Directory.Exists(directory))
                 Directory.CreateDirectory(directory);
 
-            var classContent = $@"
-using UnityEngine;
-using SaveSystemToolkit.Encryption;
+            var classContent = $@"using SaveEncryptionToolkit.Encryption;
 
-namespace SaveSystemToolkit.Runtime
+namespace SaveEncryptionToolkit.Runtime
 {{
     public static class ProductionKeyStore
     {{
@@ -114,9 +119,25 @@ namespace SaveSystemToolkit.Runtime
             return KeyObfuscator.Decode(_iv);
         }}
     }}
-}}";
+}}
+";
 
             File.WriteAllText(filePath, classContent);
+        }
+
+        private string ResolveRuntimeDirectory()
+        {
+            var script = MonoScript.FromScriptableObject(this);
+            if (script != null)
+            {
+                var scriptPath = AssetDatabase.GetAssetPath(script);
+                var editorDir = Path.GetDirectoryName(scriptPath);
+                var toolkitRoot = editorDir != null ? Path.GetDirectoryName(editorDir) : null;
+                if (!string.IsNullOrEmpty(toolkitRoot))
+                    return Path.Combine(toolkitRoot, "Runtime");
+            }
+
+            return "Assets/SaveEncryptionToolkit/Runtime";
         }
 
         // This method will be called via EditorApplication.delayCall

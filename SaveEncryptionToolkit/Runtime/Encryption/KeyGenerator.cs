@@ -5,15 +5,15 @@ namespace SaveEncryptionToolkit.Encryption
 {
     public static class KeyGenerator
     {
-        public static (string obfuscatedKey, string obfuscatedIV) GenerateKeyAndIv()
+        public static (string key, string iv) GenerateKeyAndIv()
         {
             using var aes = Aes.Create();
             aes.GenerateKey();
             aes.GenerateIV();
 
             return (
-                KeyObfuscator.Encode(Convert.ToBase64String(aes.Key)),
-                KeyObfuscator.Encode(Convert.ToBase64String(aes.IV))
+                Convert.ToBase64String(aes.Key),
+                Convert.ToBase64String(aes.IV)
             );
         }
     }
