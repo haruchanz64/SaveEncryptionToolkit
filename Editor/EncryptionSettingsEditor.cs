@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using SaveEncryptionToolkit.Encryption;
 using UnityEditor;
 using UnityEngine;
@@ -70,6 +71,7 @@ namespace SaveEncryptionToolkit.Editor
             {
                 var (rawKey, rawIv) = KeyGenerator.GenerateKeyAndIv();
 
+                Undo.RecordObject(settings, "Generate Secure Save Keys");
                 settings.encryptedKey = KeyObfuscator.Encode(rawKey);
                 settings.encryptedIv = KeyObfuscator.Encode(rawIv);
 
@@ -131,10 +133,15 @@ namespace SaveEncryptionToolkit.Runtime
             if (script != null)
             {
                 var scriptPath = AssetDatabase.GetAssetPath(script);
-                var editorDir = Path.GetDirectoryName(scriptPath);
-                var toolkitRoot = editorDir != null ? Path.GetDirectoryName(editorDir) : null;
-                if (!string.IsNullOrEmpty(toolkitRoot))
-                    return Path.Combine(toolkitRoot, "Runtime");
+                // Only write inside the toolkit folder if it lives under Assets/ (Packages/ is read-only in UPM)
+                if (!string.IsNullOrEmpty(scriptPath) &&
+                    scriptPath.StartsWith("Assets/", StringComparison.OrdinalIgnoreCase))
+                {
+                    var editorDir = Path.GetDirectoryName(scriptPath);
+                    var toolkitRoot = editorDir != null ? Path.GetDirectoryName(editorDir) : null;
+                    if (!string.IsNullOrEmpty(toolkitRoot))
+                        return Path.Combine(toolkitRoot, "Runtime");
+                }
             }
 
             return "Assets/SaveEncryptionToolkit/Runtime";

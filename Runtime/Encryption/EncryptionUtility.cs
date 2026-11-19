@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Security.Cryptography;
 using System.Text;
+using UnityEngine;
 
 namespace SaveEncryptionToolkit.Encryption
 {
@@ -8,6 +9,13 @@ namespace SaveEncryptionToolkit.Encryption
     {
         private static byte[] _key;
         private static byte[] _iv;
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        private static void ResetStaticState()
+        {
+            _key = null;
+            _iv = null;
+        }
 
         public static void Initialize(EncryptionSettings encryptionSettings)
         {

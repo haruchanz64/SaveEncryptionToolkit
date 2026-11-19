@@ -9,9 +9,13 @@ A flexible, encryption-ready save system toolkit for Unity. Use your own save ma
 - **Editor Integration**: Streamlined workflow with custom Unity Editor tools for one-click encryption key generation and secure embedding into your project builds.
 - **Obfuscated Keys**: Encryption keys are obfuscated and embedded directly into your compiled game, eliminating the need to expose sensitive ScriptableObject assets in your builds.
 
-## Installation
+## Installation (Unity 6+)
 
-### 1. Clone or Download
+### 1. Install the Package
+- **Unity Package Manager (Recommended)**: In Unity 6, open `Window > Package Manager`, click `+ > Add package from git URL...`, and enter:
+  ```
+  https://github.com/haruchanz64/SaveEncryptionToolkit.git
+  ```
 - **Clone**: Clone this repository directly into your Unity project's `Assets` directory (e.g., `Assets/SaveEncryptionToolkit`).
 - **Download ZIP**: Click **Code > Download ZIP** on GitHub, extract the archive, and copy the extracted folder into your Unity project's `Assets` directory (e.g., `Assets/SaveEncryptionToolkit`).
 
